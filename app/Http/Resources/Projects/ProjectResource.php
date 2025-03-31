@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\Projects;
 
+use App\Enums\ProjectStatusEnum;
+use App\Http\Resources\Enums\EnumResource;
 use App\Http\Resources\Users\UserResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -22,7 +24,7 @@ class ProjectResource extends JsonResource
             'description' => $this->description,
             'created_at' => (new Carbon($this->created_at))->format('Y-m-d'),
             'due_date' => (new Carbon($this->due_date))->format('Y-m-d'),
-            'status' => $this->status,
+            'status' => EnumResource::make($this->status),
             'image_path' => $this->image_path,
             'createdBy' => UserResource::make($this->createdBy),
             'updatedBy' => UserResource::make($this->updatedBy),

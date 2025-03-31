@@ -1,0 +1,10 @@
+{
+    "pending": "Pending",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+
+    "temp": "temp"
+}

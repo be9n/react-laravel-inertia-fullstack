@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProjectStatusEnum;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
+use App\Http\Resources\Enums\EnumResource;
 use App\Http\Resources\Projects\ProjectResource;
 use App\Models\Project;
 
@@ -14,12 +16,29 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $query = Project::query()->with(['createdBy', 'updatedBy']);
+        $sortBy = request('sort_by', 'id');
+        $sortDir = request('sort_dir', 'asc');
 
-        $projects = $query->paginate(10)->onEachSide(1);
+        $projects = Project::with(['createdBy', 'updatedBy'])
+            ->applySearch()
+            ->filter()
+            ->orderBy($sortBy, $sortDir)
+            ->paginate(request('per_page', 10));
+
+        $paginationData = [
+            'current_page' => $projects->currentPage(),
+            'last_page' => $projects->lastPage(),
+            'per_page' => $projects->perPage(),
+            'total' => $projects->total(),
+            'has_more_pages' => $projects->hasMorePages(),
+            'has_pages' => $projects->hasPages(),
+            'path' => $projects->path(),
+        ];
 
         return inertia('Projects/Index', [
-            'projects' => ProjectResource::collection($projects)
+            'projects' => ProjectResource::collection($projects->items()),
+            'pagination' => $paginationData,
+            'project_statuses' => EnumResource::collection(ProjectStatusEnum::cases())
         ]);
     }
 

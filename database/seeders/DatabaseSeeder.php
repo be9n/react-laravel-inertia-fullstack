@@ -14,17 +14,22 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()
-            ->create([
-                'name' => 'Apo Nas',
-                'email' => 'apo@gmail.com',
-                'password' => '123123',
-                'email_verified_at' => now()
-            ]);
+        // User::factory()
+        //     ->create([
+        //         'name' => 'Apo Nas',
+        //         'email' => 'apo@gmail.com',
+        //         'password' => '123123',
+        //         'email_verified_at' => now()
+        //     ]);
+
+        // Project::factory()
+        //     ->count(30)
+        //     ->hasTasks(30)
+        //     ->create();
 
         Project::factory()
-            ->count(30)
-            ->hasTasks(30)
+            ->count(100)
+            // ->hasTasks(30)
             ->create();
     }
 }

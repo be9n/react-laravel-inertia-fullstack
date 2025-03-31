@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\ProjectStatusEnum;
+use App\Traits\Filterable;
+use App\Traits\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +12,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable, Filterable;
+
+    protected $searchable = [
+        'columns' => [
+            'name' => 10,
+        ]
+    ];
+
+    protected $filterColumns = [
+        'status' => []
+    ];
 
     protected $guarded = [];
 
