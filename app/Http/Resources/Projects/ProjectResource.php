@@ -11,6 +11,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProjectResource extends JsonResource
 {
+    public static $wrap = false;
+
     /**
      * Transform the resource into an array.
      *
@@ -26,8 +28,8 @@ class ProjectResource extends JsonResource
             'due_date' => (new Carbon($this->due_date))->format('Y-m-d'),
             'status' => EnumResource::make($this->status),
             'image_path' => $this->image_path,
-            'createdBy' => UserResource::make($this->createdBy),
-            'updatedBy' => UserResource::make($this->updatedBy),
+            'created_by' => UserResource::make($this->createdBy),
+            'updated_by' => UserResource::make($this->updatedBy),
         ];
     }
 }

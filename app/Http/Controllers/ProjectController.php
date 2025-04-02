@@ -3,43 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ProjectStatusEnum;
+use App\Enums\TaskStatusEnum;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Http\Resources\Enums\EnumResource;
 use App\Http\Resources\Projects\ProjectResource;
+use App\Http\Resources\Tasks\TaskResource;
 use App\Models\Project;
+use App\Models\Task;
+use App\Services\ProjectService;
+use App\Services\TaskService;
 
 class ProjectController extends Controller
 {
+    protected TaskService $taskService;
+    protected ProjectService $projectService;
+
+    public function __construct(TaskService $taskService, ProjectService $projectService)
+    {
+        $this->taskService = $taskService;
+        $this->projectService = $projectService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $sortBy = request('sort_by', 'id');
-        $sortDir = request('sort_dir', 'asc');
+        $projectData = $this->projectService->getPaginatedProjects();
 
-        $projects = Project::with(['createdBy', 'updatedBy'])
-            ->applySearch()
-            ->filter()
-            ->orderBy($sortBy, $sortDir)
-            ->paginate(request('per_page', 10));
-
-        $paginationData = [
-            'current_page' => $projects->currentPage(),
-            'last_page' => $projects->lastPage(),
-            'per_page' => $projects->perPage(),
-            'total' => $projects->total(),
-            'has_more_pages' => $projects->hasMorePages(),
-            'has_pages' => $projects->hasPages(),
-            'path' => $projects->path(),
-        ];
-
-        return inertia('Projects/Index', [
-            'projects' => ProjectResource::collection($projects->items()),
-            'pagination' => $paginationData,
-            'project_statuses' => EnumResource::collection(ProjectStatusEnum::cases())
-        ]);
+        return inertia('Projects/Index', $projectData);
     }
 
     /**
@@ -63,7 +56,13 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        //
+        // Get paginated tasks for this project using the TaskService
+        $taskData = $this->taskService->getPaginatedTasks($project->tasks());
+
+        return inertia('Projects/Show', array_merge(
+            ['project' => ProjectResource::make($project)],
+            $taskData
+        ));
     }
 
     /**

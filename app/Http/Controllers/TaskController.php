@@ -2,18 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TaskStatusEnum;
 use App\Http\Requests\Task\StoreTaskRequest;
 use App\Http\Requests\Task\UpdateTaskRequest;
+use App\Http\Resources\Enums\EnumResource;
+use App\Http\Resources\Tasks\TaskResource;
 use App\Models\Task;
+use App\Services\TaskService;
 
 class TaskController extends Controller
 {
+    protected TaskService $taskService;
+
+    public function __construct(TaskService $taskService)
+    {
+        $this->taskService = $taskService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $taskData = $this->taskService->getPaginatedTasks();
+        
+        return inertia('Tasks/Index', $taskData);
     }
 
     /**

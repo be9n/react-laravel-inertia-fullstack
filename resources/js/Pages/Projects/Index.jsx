@@ -1,13 +1,13 @@
-import Pagination from "@/Components/Pagination";
-import SearchInput from "@/Components/SearchInput";
+// import Pagination2 from "@/Components/Pagination2";
+import Pagination2 from "@/Components/Pagination";
+import SearchInput2 from "@/Components/SearchInput";
 import SelectInput from "@/Components/SelectInput";
-import TableHeading from "@/Components/TableHeading";
+import TableHeading2 from "@/Components/TableHeading";
 import { PROJECT_STATUS_CLASS_MAP } from "@/constants";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useApiFiltersStore } from "@/store/useApiFiltersStore";
-import { useQueryParamsStore } from "@/store/useQueryParamsStore";
-import { Head, Link, router } from "@inertiajs/react";
-import { useEffect, useState } from "react";
+import useQueryParamsStore from "@/store/useQueryParamsStore";
+import { Head, Link } from "@inertiajs/react";
+import { useEffect } from "react";
 
 const tableColumns = [
   {
@@ -47,26 +47,12 @@ const tableColumns = [
 ];
 
 export default function Index({ projects, pagination, project_statuses }) {
-  const { queryParams } = useQueryParamsStore();
-  const { filters, setFilter, resetFilters, formatToQueryString } =
-    useApiFiltersStore();
-  const [isInitialMount, setIsInitialMount] = useState(true);
+  const { filters, setFilters, resetFilters, syncWithUrl } =
+    useQueryParamsStore();
 
   useEffect(() => {
-    if (isInitialMount) {
-      setIsInitialMount(false);
-      return;
-    }
-
-    router.get(
-      route("project.index"),
-      { ...queryParams, filters: formatToQueryString() },
-      {
-        preserveState: true,
-        preserveScroll: true,
-      }
-    );
-  }, [queryParams, filters]);
+    syncWithUrl(route("project.index"));
+  }, []);
 
   return (
     <AuthenticatedLayout
@@ -89,7 +75,7 @@ export default function Index({ projects, pagination, project_statuses }) {
                       <th className="px-3 py-3 text-start"></th>
                       <th className="px-3 py-3 text-start"></th>
                       <th className="px-3 py-3 text-start">
-                        <SearchInput />
+                        <SearchInput2 placeholder="Search for projects" />
                       </th>
                       <th className="px-3 py-3 text-start">
                         <SelectInput
@@ -98,7 +84,7 @@ export default function Index({ projects, pagination, project_statuses }) {
                             const value = e.target.value;
                             value === ""
                               ? resetFilters("status")
-                              : setFilter("status", e.target.value);
+                              : setFilters({ status: e.target.value });
                           }}
                           className="w-full cursor-pointer"
                         >
@@ -125,13 +111,13 @@ export default function Index({ projects, pagination, project_statuses }) {
                   <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 border-b-2 border-gray-500">
                     <tr className="text-nowrap">
                       {tableColumns.map(({ title, sortName, isSortable }) => (
-                        <TableHeading
+                        <TableHeading2
                           key={title}
                           name={sortName}
                           isSortable={isSortable}
                         >
                           {title}
-                        </TableHeading>
+                        </TableHeading2>
                       ))}
                     </tr>
                   </thead>
@@ -151,8 +137,10 @@ export default function Index({ projects, pagination, project_statuses }) {
                             />
                           </div>
                         </td>
-                        <td className="px-3 py-2 max-w-[150px]">
-                          {project.name}
+                        <td className="px-3 py-2 max-w-[150px] text-gray-300 hover:underline">
+                          <Link href={route("project.show", project.id)}>
+                            {project.name}
+                          </Link>
                         </td>
                         <td className="px-3 py-2">
                           <span
@@ -165,7 +153,7 @@ export default function Index({ projects, pagination, project_statuses }) {
                         </td>
                         <td className="px-3 py-2">{project.created_at}</td>
                         <td className="px-3 py-2">{project.due_date}</td>
-                        <td className="px-3 py-2">{project.createdBy.name}</td>
+                        <td className="px-3 py-2">{project.created_by.name}</td>
                         <td className="px-3 py-2">
                           <Link
                             href={route("project.edit", project.id)}
@@ -185,7 +173,7 @@ export default function Index({ projects, pagination, project_statuses }) {
                   </tbody>
                 </table>
               </div>
-              <Pagination
+              <Pagination2
                 pagination={pagination}
               />
             </div>

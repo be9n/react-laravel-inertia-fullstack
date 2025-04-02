@@ -1,9 +1,9 @@
 import { Link } from "@inertiajs/react";
 import SelectInput from "./SelectInput";
-import { useQueryParamsStore } from "@/store/useQueryParamsStore";
+import useQueryParamsStore from "@/store/useQueryParamsStore";
 
-export default function Pagination({ pagination }) {
-  const { queryParams, setQueryParam } = useQueryParamsStore();
+export default function Pagination2({ pagination }) {
+  const { queryParams, setQueryParams } = useQueryParamsStore();
   const { current_page, last_page, path, has_pages } = pagination;
 
   if (!has_pages) {
@@ -131,7 +131,11 @@ export default function Pagination({ pagination }) {
         <SelectInput
           className="w-full text-xs cursor-pointer"
           value={queryParams.per_page}
-          onChange={(e) => setQueryParam("per_page", e.target.value)}
+          onChange={(e) =>
+            setQueryParams({
+              per_page: e.target.value == "" ? undefined : e.target.value,
+            })
+          }
         >
           <option value="" className="cursor-pointer">
             Default

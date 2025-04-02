@@ -1,18 +1,23 @@
-import { useQueryParamsStore } from "@/store/useQueryParamsStore";
 import { useEffect, useState } from "react";
 import TextInput from "./TextInput";
 import { useDebounce } from "use-debounce";
+import useQueryParamsStore from "@/store/useQueryParamsStore";
 
-export default function SearchInput() {
-  const { queryParams, setQueryParam } = useQueryParamsStore();
+export default function SearchInput2({ placeholder }) {
+  const { queryParams, setQueryParams } = useQueryParamsStore();
   const [searchTerm, setSearchTerm] = useState(queryParams.search || "");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
+  const [isInitialMount, setIsInitialMount] = useState(true);
 
   useEffect(() => {
-    setQueryParam(
-      "search",
-      debouncedSearchTerm === "" ? undefined : debouncedSearchTerm
-    );
+    if (isInitialMount) {
+      setIsInitialMount(false);
+      return;
+    }
+
+    setQueryParams({
+      search: debouncedSearchTerm === "" ? undefined : debouncedSearchTerm,
+    });
   }, [debouncedSearchTerm]);
 
   useEffect(() => {
@@ -22,7 +27,7 @@ export default function SearchInput() {
   return (
     <TextInput
       className="w-full"
-      placeholder="Project Name"
+      placeholder={placeholder ?? "Search here"}
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
     />

@@ -1,29 +1,22 @@
-import { useQueryParamsStore } from "@/store/useQueryParamsStore";
+import useQueryParamsStore from "@/store/useQueryParamsStore";
 import SortChevrons from "./SortChevrons";
 
-export default function TableHeading({
-  name,
-  isSortable = false,
-  children,
-}) {
+export default function TableHeading2({ name, isSortable = false, children }) {
   const { queryParams, setQueryParams } = useQueryParamsStore();
 
   const sortChanged = (name) => {
-    setQueryParams(({ sort_by, sort_dir, ...rest }) => {
-      const isSameSort = sort_by === name;
-      const newSortDir = isSameSort
-        ? sort_dir === "asc"
-          ? "desc"
-          : sort_dir
-          ? undefined
-          : "asc"
-        : "asc";
+    const isSameSort = queryParams.sort_by === name;
+    const newSortDir = isSameSort
+      ? queryParams.sort_dir === "asc"
+        ? "desc"
+        : queryParams.sort_dir
+        ? undefined
+        : "asc"
+      : "asc";
 
-      return {
-        ...rest,
-        sort_by: newSortDir ? name : undefined,
-        sort_dir: newSortDir,
-      };
+    setQueryParams({
+      sort_by: newSortDir ? name : undefined,
+      sort_dir: newSortDir,
     });
   };
 
@@ -39,7 +32,10 @@ export default function TableHeading({
       >
         {children}
         {isSortable && (
-          <SortChevrons isVisible={queryParams.sort_by === name} dir={queryParams.sort_dir} />
+          <SortChevrons
+            isVisible={queryParams.sort_by === name}
+            dir={queryParams.sort_dir}
+          />
         )}
       </div>
     </th>
