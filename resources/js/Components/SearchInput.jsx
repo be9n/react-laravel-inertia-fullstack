@@ -26,7 +26,7 @@ export default function SearchInput2({ placeholder }) {
 
   return (
     <TextInput
-      className="w-full"
+      className="w-[250px]"
       placeholder={placeholder ?? "Search here"}
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}

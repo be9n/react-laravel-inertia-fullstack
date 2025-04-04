@@ -6,7 +6,6 @@ use App\Enums\ProjectStatusEnum;
 use App\Http\Resources\Enums\EnumResource;
 use App\Http\Resources\Projects\ProjectResource;
 use App\Models\Project;
-use Illuminate\Database\Eloquent\Builder;
 
 class ProjectService
 {
@@ -25,7 +24,7 @@ class ProjectService
     public function getPaginatedProjects(): array
     {
         $sortBy = request('sort_by', 'id');
-        $sortDir = request('sort_dir', 'asc');
+        $sortDir = request('sort_dir', 'desc');
 
         $projects = Project::with(['createdBy', 'updatedBy'])
             ->applySearch()
@@ -36,7 +35,12 @@ class ProjectService
         return [
             'projects' => ProjectResource::collection($projects->items()),
             'pagination' => $this->paginationService->getPaginationData($projects),
-            'project_statuses' => EnumResource::collection(ProjectStatusEnum::cases())
+            'project_statuses' => $this->getProjectStatusesList()
         ];
+    }
+
+    public function getProjectStatusesList()
+    {
+        return EnumResource::collection(ProjectStatusEnum::cases());
     }
 }

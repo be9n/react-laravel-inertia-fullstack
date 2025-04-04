@@ -6,8 +6,9 @@ import TableHeading2 from "@/Components/TableHeading";
 import { PROJECT_STATUS_CLASS_MAP } from "@/constants";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import useQueryParamsStore from "@/store/useQueryParamsStore";
-import { Head, Link } from "@inertiajs/react";
-import { useEffect } from "react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const tableColumns = [
   {
@@ -50,6 +51,12 @@ export default function Index({ projects, pagination, project_statuses }) {
   const { filters, setFilters, resetFilters, syncWithUrl } =
     useQueryParamsStore();
 
+  const deleteProject = (id) => {
+    if (!window.confirm("Are you sure you want to delete the project?")) return;
+
+    router.delete(route("project.destroy", id));
+  };
+
   useEffect(() => {
     syncWithUrl(route("project.index"));
   }, []);
@@ -57,9 +64,17 @@ export default function Index({ projects, pagination, project_statuses }) {
   return (
     <AuthenticatedLayout
       header={
-        <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-          Projects
-        </h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+            Projects
+          </h2>
+          <Link
+            href={route("project.create")}
+            className="bg-emerald-500 py-1 px-3 text-white rounded shadow transition-colors hover:bg-emerald-600"
+          >
+            Add New
+          </Link>
+        </div>
       }
     >
       <Head title="Projects" />
@@ -161,21 +176,19 @@ export default function Index({ projects, pagination, project_statuses }) {
                           >
                             Edit
                           </Link>
-                          <Link
-                            href={route("project.destroy", project.id)}
+                          <button
                             className="font-medium text-red-600 dark:text-red-500 hover:underline mx-1"
+                            onClick={() => deleteProject(project.id)}
                           >
                             Delete
-                          </Link>
+                          </button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-              <Pagination2
-                pagination={pagination}
-              />
+              <Pagination2 pagination={pagination} />
             </div>
           </div>
         </div>

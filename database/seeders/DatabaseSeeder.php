@@ -23,8 +23,8 @@ class DatabaseSeeder extends Seeder
         //         'email_verified_at' => now()
         //     ]);
 
-        Task::factory(250)
-        ->create();
+        // Task::factory(250)
+        // ->create();
 
         // Project::factory()
         //     ->count(100)

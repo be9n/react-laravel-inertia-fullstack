@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Project;
 
+use App\Enums\ProjectStatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreProjectRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class StoreProjectRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +24,11 @@ class StoreProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', 'string', 'max:191'],
+            'description' => ['nullable', 'string', 'max:550'],
+            'due_date' => ['nullable', 'date'],
+            'status' => ['required', Rule::in(array_column(ProjectStatusEnum::cases(), 'value'))],
+            'image' => ['required', 'image']
         ];
     }
 }

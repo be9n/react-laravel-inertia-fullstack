@@ -46,60 +46,42 @@ const tableColumns = [
   },
 ];
 
-export default function Table({
-  tasks,
-  pagination,
-  task_statuses,
-}) {
-  const { filters, setFilters, resetFilters } =
-    useQueryParamsStore();
+export default function Table({ tasks, pagination, task_statuses }) {
+  const { filters, setFilters, resetFilters } = useQueryParamsStore();
 
   return (
     <>
       <div className="overflow-auto">
+        <div className="min-w-full flex gap-5 p-2 border-b-2 border-gray-500 bg-gray-50 dark:bg-gray-700">
+          <SearchInput2 placeholder="Search for tasks" />
+
+          <SelectInput
+            value={filters?.status || ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              value === ""
+                ? resetFilters("status")
+                : setFilters({
+                    status: e.target.value == "" ? undefined : e.target.value,
+                  });
+            }}
+            className="w-[200px] cursor-pointer"
+          >
+            <option value="" className="cursor-pointer">
+              Select Status
+            </option>
+            {task_statuses.data.map((status) => (
+              <option
+                className="cursor-pointer"
+                key={status.key}
+                value={status.key}
+              >
+                {status.value}
+              </option>
+            ))}
+          </SelectInput>
+        </div>
         <table className="min-w-[1000px] w-full text-sm text-start text-gray-500 dark:text-gray-400">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 border-b-2 border-gray-500">
-            <tr className="text-nowrap">
-              <th className="px-3 py-3 text-start"></th>
-              <th className="px-3 py-3 text-start"></th>
-              <th className="px-3 py-3 text-start">
-                <SearchInput2 placeholder="Search for tasks" />
-              </th>
-              <th className="px-3 py-3 text-start"></th>
-              <th className="px-3 py-3 text-start">
-                <SelectInput
-                  value={filters?.status || ""}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    value === ""
-                      ? resetFilters("status")
-                      : setFilters({
-                          status:
-                            e.target.value == "" ? undefined : e.target.value,
-                        });
-                  }}
-                  className="w-full cursor-pointer"
-                >
-                  <option value="" className="cursor-pointer">
-                    Select Status
-                  </option>
-                  {task_statuses.data.map((status) => (
-                    <option
-                      className="cursor-pointer"
-                      key={status.key}
-                      value={status.key}
-                    >
-                      {status.value}
-                    </option>
-                  ))}
-                </SelectInput>
-              </th>
-              <th className="px-3 py-3 text-start"></th>
-              <th className="px-3 py-3 text-start"></th>
-              <th className="px-3 py-3 text-start"></th>
-              <th className="px-3 py-3"></th>
-            </tr>
-          </thead>
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 border-b-2 border-gray-500">
             <tr className="text-nowrap">
               {tableColumns.map(({ title, sortName, isSortable }) => (

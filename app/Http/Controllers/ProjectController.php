@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ProjectStatusEnum;
-use App\Enums\TaskStatusEnum;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
-use App\Http\Resources\Enums\EnumResource;
 use App\Http\Resources\Projects\ProjectResource;
-use App\Http\Resources\Tasks\TaskResource;
 use App\Models\Project;
-use App\Models\Task;
 use App\Services\ProjectService;
 use App\Services\TaskService;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
@@ -30,9 +26,10 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projectData = $this->projectService->getPaginatedProjects();
+        $projectsData = $this->projectService->getPaginatedProjects();
 
-        return inertia('Projects/Index', $projectData);
+
+        return inertia('Projects/Index', $projectsData);
     }
 
     /**
@@ -40,7 +37,11 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        //
+        $projectStatusesList = $this->projectService->getProjectStatusesList();
+
+        return inertia('Projects/Create', [
+            'project_statuses_list' => $projectStatusesList
+        ]);
     }
 
     /**
@@ -48,7 +49,18 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request)
     {
-        //
+        $data = $request->validated();
+
+        $image = $data['image'] ?? null;
+        if ($image) {
+            $data['image_path'] = $image->store('projects/', 'public');
+        }
+
+        $data['created_by'] = auth()->id();
+        $data['updated_by'] = auth()->id();
+        Project::create($data);
+
+        return to_route('project.index')->withAlert('Project created successfully!');
     }
 
     /**
@@ -59,10 +71,10 @@ class ProjectController extends Controller
         // Get paginated tasks for this project using the TaskService
         $taskData = $this->taskService->getPaginatedTasks($project->tasks());
 
-        return inertia('Projects/Show', array_merge(
-            ['project' => ProjectResource::make($project)],
-            $taskData
-        ));
+        return inertia('Projects/Show', [
+            ...$taskData,
+            'project' => ProjectResource::make($project)
+        ]);
     }
 
     /**
@@ -70,7 +82,10 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        //
+        return inertia('Projects/Edit', [
+            'project' => ProjectResource::make($project),
+            'project_statuses_list' => $this->projectService->getProjectStatusesList()
+        ]);
     }
 
     /**
@@ -78,7 +93,21 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        //
+        $data = $request->validated();
+
+        $image = $data['image'] ?? null;
+        if ($image) {
+            if ($project->image_path) {
+                Storage::disk('public')->delete($project->image_path);
+            }
+
+            $data['image_path'] = $image->store('projects/', 'public');
+        }
+
+        $data['updated_by'] = auth()->id();
+        $project->update($data);
+
+        return redirect()->back()->with('resetForm', true)->withAlert('Project updated successfully!');
     }
 
     /**
@@ -86,6 +115,14 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        dd("destroy $project->id");
+
+        if ($project->image_path) {
+            Storage::disk('public')->delete($project->image_path);
+        }
+
+        $project->delete();
+
+        return redirect()->back()
+            ->withAlert("The project $project->name was deleted successfully");
     }
 }

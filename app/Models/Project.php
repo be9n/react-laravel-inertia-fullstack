@@ -24,7 +24,15 @@ class Project extends Model
         'status' => []
     ];
 
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'description',
+        'image_path',
+        'due_date',
+        'status',
+        'created_by',
+        'updated_by',
+    ];
 
     protected $casts = [
         'status' => ProjectStatusEnum::class

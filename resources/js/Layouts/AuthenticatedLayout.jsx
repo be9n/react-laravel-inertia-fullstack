@@ -3,13 +3,21 @@ import Dropdown from "@/Components/Dropdown";
 import NavLink from "@/Components/NavLink";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Link, usePage } from "@inertiajs/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast, Toaster } from "sonner";
 
 export default function AuthenticatedLayout({ auth, header, children }) {
   const user = usePage().props.auth.user;
+  const alert = usePage().props.flash.alert;
 
   const [showingNavigationDropdown, setShowingNavigationDropdown] =
     useState(false);
+
+  useEffect(() => {
+    if (alert) {
+      toast[alert.type](alert.message);
+    }
+  }, [alert]);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -181,7 +189,10 @@ export default function AuthenticatedLayout({ auth, header, children }) {
         </header>
       )}
 
-      <main>{children}</main>
+      <main>
+        {children}
+        <Toaster richColors />
+      </main>
     </div>
   );
 }
